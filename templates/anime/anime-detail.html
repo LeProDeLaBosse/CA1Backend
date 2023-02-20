@@ -1,0 +1,35 @@
+{% extends '_partials/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+    <h1 class="ui header">Anime Detail</h1>
+
+    <div class="ui card">
+        <div class="content">
+            <div class="header">{{anime.title}}</div>
+            <div class="meta">{{anime.created_at}}</div>
+            <div class="description"><p>{{anime.description}}</p></div>
+        </div>
+    </div>
+    <div class="extra content">
+
+        {% if anime.is_completed %}
+        <p>
+            <i class="check icon green"></i>
+            Completed at {{anime.updated_at}}
+        </p>
+
+        {% else %}
+        <p>
+            Not yet completed
+        </p>
+
+        {% endif %}
+
+        <a href="" class="ui button primary">Edit</a>
+        <a href={% url 'anime-delete' anime.id %} class="ui button red">Delete this anime</a>
+    </div>
+
+{% endblock content %}

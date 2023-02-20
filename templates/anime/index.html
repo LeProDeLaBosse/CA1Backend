@@ -1,0 +1,71 @@
+{% extends '_partials/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+    <!--  <image src="{% static 'img/one-piece-nawpic.png' %}" />  -->
+
+    <h1 class="ui header">Anime list</h1>
+
+    {% if animes %}
+
+    <table class="ui table">
+        <thead>
+
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Completed</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+
+        <tbody>
+            {% for anime in animes %}
+            <tr>
+                <td>{{anime.title}}</td>
+                <td>{{anime.description}}</td>
+
+
+                <td>
+                    {% if anime.is_completed %}
+
+                    YES <i class="check icon green"></i>
+
+                    {% else %}
+
+                    NO 
+
+                    {% endif %}
+
+                    {{anime.is_complited}}</td>
+
+                <td>
+
+                    <a href={% url 'anime' anime.pk %} class="ui button">
+                        <i class="eye icon"></i>
+                    </a>
+
+                    <a href="" class="ui button">
+                        <i class="pencil icon"></i>
+                    </a>
+            </tr>
+            {% endfor %}
+
+
+        </tbody>
+    </table>
+
+    {% else %}
+
+    <div class="ui message">
+        <div class="header">
+            No animes yet
+        </div>
+        <p>You can create your first anime review now <a href={% url 'create-anime-review' %}>Add new</p>
+    </div>
+
+    {% endif %}
+{% endblock content %}

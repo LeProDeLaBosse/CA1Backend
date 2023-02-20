@@ -1,0 +1,16 @@
+{% extends '_partials/base.html' %}
+
+{% block content %}
+
+    <h1 class="ui header">Delete Anime?</h1>
+
+    <form method="POST" action={% url 'anime-delete' anime.id %} class="ui form">
+        {% csrf_token %}
+        <p>
+            Are you sure you want to delete the anime?
+        </p>
+        <input type="submit" class="ui button negative" value="YES">
+        <a href={% url 'anime' anime.id %}>NO</a>
+    </form>
+
+{% endblock content %}
