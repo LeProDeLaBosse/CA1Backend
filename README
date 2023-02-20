@@ -1,0 +1,15 @@
+Anime Review App
+This is a simple Django web application for reviewing anime. Users can create an account, browse a list of anime reviews, and add their own reviews. The app includes functionality for editing and deleting reviews, as well as a simple search feature.
+
+Usage
+To use the app, you'll need to create an account. Click the "Register" link in the top right corner of the homepage and enter your details. Once you've created an account, you'll be able to add, edit, and delete your own anime reviews.
+
+To search for reviews, use the search bar at the top of the homepage. You can search by title, description, or completion status.
+
+Contributing
+If you'd like to contribute to this app, please follow these steps:
+
+- Fork the repository and create a new branch for your changes.
+- Make your changes and test them locally.
+- Submit a pull request with a detailed description of your changes.
+All contributions are welcome, and I'm happy to help if you have any questions or issues.
