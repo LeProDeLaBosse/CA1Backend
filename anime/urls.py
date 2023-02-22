@@ -9,8 +9,8 @@ urlpatterns = [
     path('create/', views.create_anime_review, name='create-anime-review'),
     # URL for viewing anime details
     path('anime/<id>/', views.anime_detail, name='anime'),
-    # URL for deleting an anime
+    # URL for deleting an anime review
     path('anime-delete/<id>/', views.anime_delete, name='anime-delete'),
-
+    # URL for editing an anime review
     path('anime-edit/<id>/', views.anime_edit, name='anime-edit'),
 ]
