@@ -5,10 +5,24 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
 
+def get_showing_animes(request, animes):
+
+    if request.GET and request.GET.get('filter'):
+        if request.GET.get('filter') == 'complete':
+            return animes.filter(is_completed = True)
+        if request.GET.get('filter') == 'incomplete':
+            return animes.filter(is_completed = False)
+    return animes
+
 def index(request):
     # Retrieve all Anime objects from the database
     animes=Anime.objects.all()
-    context = {'animes': animes} 
+    completed_count = animes.filter(is_completed = True).count()
+    incompleted_count = animes.filter(is_completed = False).count()
+    all_count = animes.count()
+    
+    context = {'animes': get_showing_animes(request, animes), 'all_count': all_count, 'completed_count': completed_count, 
+               'incompleted_count': incompleted_count}
     # Render the index.html template with the retrieved Anime objects   
     return render(request, 'anime/index.html', context)
 
@@ -59,3 +73,26 @@ def anime_delete(request, id):
     
     # Render the anime-delete.html template with the retrieved Anime object
     return render(request, 'anime/anime-delete.html', context)
+
+def anime_edit(request, id):
+    anime = get_object_or_404(Anime, pk=id)
+    form = AnimeForm(instance = anime)
+    context = {'anime': anime, 'form': form}
+
+    if request.method == 'POST':
+        # Get the form data from the request
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        is_completed = request.POST.get('is_completed', False)
+
+        anime.title = title
+        anime.description = description
+        anime.is_completed = True if is_completed== "on" else False
+
+        # Save the new Anime instance to the database
+        anime.save()
+
+        # Redirect to the detail view for the newly created Anime instance
+        return HttpResponseRedirect(reverse("anime", kwargs={'id': anime.pk}))
+
+    return render(request, 'anime/anime-edit.html', context)

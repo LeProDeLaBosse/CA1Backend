@@ -28,7 +28,7 @@
 
         {% endif %}
 
-        <a href="" class="ui button primary">Edit</a>
+        <a href={% url 'anime-edit' anime.id %} class="ui button primary">Edit</a>
         <a href={% url 'anime-delete' anime.id %} class="ui button red">Delete this anime</a>
     </div>
 

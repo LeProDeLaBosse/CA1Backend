@@ -48,7 +48,7 @@
                         <i class="eye icon"></i>
                     </a>
 
-                    <a href="" class="ui button">
+                    <a href={% url 'anime-edit' anime.pk %} class="ui button">
                         <i class="pencil icon"></i>
                     </a>
             </tr>
@@ -56,6 +56,20 @@
 
 
         </tbody>
+
+        <tfoot>
+            <tr>
+                <th>
+                    <a href="?filter=all">All {{all_count}}</a>
+                </th>
+                <th>
+                    <a href="?filter=incomplete">{{incompleted_count}} remaining</a>
+                </th>
+                <th>
+                    <a href="?filter=complete">{{completed_count}} completed</a>
+                </th>
+            </tr>
+        </tfoot>
     </table>
 
     {% else %}
