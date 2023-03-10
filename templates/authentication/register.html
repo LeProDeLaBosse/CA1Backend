@@ -1,9 +1,94 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 {% extends '_partials/base.html' %}
+
+{% block title %}
+
+Create an account
+
+{% endblock %}
 
 {% load static %}
 
 {% block content %}
 
-    <h3>Register here</h3>
+    <div class="ui grid">
+        <div class="four wide column"></div>
+        <div class="eight wide column">
+            <div class="ui middle aligned center aligned grid">
+                <div class="column mt-5">
+                    <div style="display: flex; align-items: center;">
+                        <img src={% static 'img/img-zoro.png' %} class="image" style="width: 100px; height: 100px;"/>
+                        <h2 class="ui teal hearder">
+                            <div class="content">Registration</div>
+                        </h2>
+                    </div>
+
+                    {% include '_partials/messages.html'%}
+                    
+
+                    <form class="ui large form" method="post" action={% url 'register' %}>
+                        {% csrf_token %}
+                        <div class="ui stacked segment">
+                            <div class="field">
+                                <div class="ui left icon input">
+                                    <i class="user icon"></i>
+                                    <input type="text" name="username" value="{{data.username}}" placeholder="Username"/>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <div class="ui left icon input">
+                                    <i class="user icon"></i>
+                                    <input type="text" name="email" value="{{data.email}}" placeholder="E-mail address"/>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <div class="ui left icon input">
+                                    <i class="lock icon"></i>
+                                    <input type="password" name="password" id="password-field" placeholder="Password"/>
+                                    <button type="button" id="togglePassword" class="ui icon button">
+                                        <i class="eye icon"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <div class="ui left icon input">
+                                    <i class="lock icon"></i>
+                                    <input type="password" name="password2" id="password2-field" placeholder="Reapeat Password"/>
+                                    <button type="button" id="togglePassword" class="ui icon button">
+                                        <i class="eye icon"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button class="ui fluid large teal submit button">Submit</button>
+                        </div>
+                    </form>
+
+                    <div class="ui message">Have an account? <a href={% url 'login'  %}>Login</a></div>
+                    <div class="four wide column"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock content %}
+
+
+
+$(document).ready(function() {
+    $("#togglePassword").on('click', function() {
+      var passwordField = $("#id_password");
+      var passwordFieldType = passwordField.attr('type');
+      if (passwordFieldType == 'password') {
+        passwordField.attr('type', 'text');
+        $(this).html('<i class="eye slash icon"></i>');
+      } else {
+        passwordField.attr('type', 'password');
+        $(this).html('<i class="eye icon"></i>');
+      }
+    });
+  });

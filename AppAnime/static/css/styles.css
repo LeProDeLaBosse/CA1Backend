@@ -1,0 +1,14 @@
+/* Hide the password input by default */
+.password-input {
+    display: none;
+}
+
+/* Show the password input when the toggle button is checked */
+.password-input:checked + .password-field input[type="password"] {
+    display: block;
+}
+
+/* Style the toggle button */
+.password-toggle {
+    cursor: pointer;
+}

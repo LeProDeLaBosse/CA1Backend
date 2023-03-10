@@ -4,6 +4,8 @@ from .models import Anime
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 # Define a helper function to filter Anime objects based on the 'filter' GET parameter of the request
 def get_showing_animes(request, animes):
@@ -18,9 +20,10 @@ def get_showing_animes(request, animes):
     # Return all Anime objects if no 'filter' parameter is present in the request
     return animes
 
+@login_required
 def index(request):
     # Retrieve all Anime objects from the database
-    animes=Anime.objects.all()
+    animes=Anime.objects.filter(owner=request.user)
     completed_count = animes.filter(is_completed = True).count()
     incompleted_count = animes.filter(is_completed = False).count()
     all_count = animes.count()
@@ -31,6 +34,7 @@ def index(request):
     # Render the index.html template with the retrieved Anime objects   
     return render(request, 'anime/index.html', context)
 
+@login_required
 def create_anime_review(request):
     # Create an empty AnimeForm instance
     form = AnimeForm()
@@ -49,9 +53,11 @@ def create_anime_review(request):
         anime.title = title
         anime.description = description
         anime.is_completed = True if is_completed== "on" else False
-
+        anime.owner = request.user
         # Save the new Anime instance to the database
         anime.save()
+
+        messages.add_message(request, messages.SUCCESS, "Anime created successfully")
 
         # Redirect to the detail view for the newly created Anime instance
         return HttpResponseRedirect(reverse("anime", kwargs={'id': anime.pk}))
@@ -59,7 +65,7 @@ def create_anime_review(request):
     # Render the create-anime-review.html template with the AnimeForm instance
     return render(request, 'anime/create-anime-review.html', context)
 
-
+@login_required
 def anime_detail(request, id):
     # Retrieve the Anime object with the given id, or display a 404 error if it doesn't exist
     anime = get_object_or_404(Anime, pk=id)
@@ -67,19 +73,28 @@ def anime_detail(request, id):
     # Render the anime-detail.html template with the retrieved Anime object
     return render(request, 'anime/anime-detail.html', context)
 
+@login_required
 def anime_delete(request, id):
     # Retrieve the Anime object with the given id, or display a 404 error if it doesn't exist
     anime = get_object_or_404(Anime, pk=id)
     context = {'anime': anime}
 
     if request.method == 'POST':
-        # If the request method is POST, delete the Anime object and redirect to the home view
-        anime.delete()
-        return HttpResponseRedirect(reverse('home'))
+        if anime.owner == request.user:
+
+            # If the request method is POST, delete the Anime object and redirect to the home view
+            anime.delete()
+
+            messages.add_message(request, messages.SUCCESS, "Anime deleted successfully")
+
+            return HttpResponseRedirect(reverse('home'))
+        
+        return render(request, 'anime/anime-delete.html', context)
     
     # Render the anime-delete.html template with the retrieved Anime object
     return render(request, 'anime/anime-delete.html', context)
 
+@login_required
 def anime_edit(request, id):
     # Retrieve the Anime object with the given id from the database
     anime = get_object_or_404(Anime, pk=id)
@@ -99,8 +114,11 @@ def anime_edit(request, id):
         anime.description = description
         anime.is_completed = True if is_completed== "on" else False
 
-        # Save the new Anime instance to the database
-        anime.save()
+        if anime.owner == request.user:
+            # Save the new Anime instance to the database
+            anime.save()
+
+        messages.add_message(request, messages.SUCCESS, "Anime update success")
 
         # Redirect to the detail view for the newly created Anime instance
         return HttpResponseRedirect(reverse("anime", kwargs={'id': anime.pk}))

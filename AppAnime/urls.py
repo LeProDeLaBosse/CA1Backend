@@ -24,5 +24,5 @@ urlpatterns = [
     # path for including the anime app's URLs
     path('', include('anime.urls')),
     # path for including the authentication app's URLs
-    path('auth', include('authentication.urls'))
+    path('auth/', include('authentication.urls'))
 ]

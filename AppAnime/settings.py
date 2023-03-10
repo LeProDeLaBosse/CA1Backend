@@ -30,6 +30,8 @@ ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = "authentication.User"
 
+LOGIN_URL = "/auth/login"
+
 
 # Application definition
 

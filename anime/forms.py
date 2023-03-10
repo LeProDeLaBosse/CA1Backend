@@ -7,4 +7,4 @@ class AnimeForm(forms.ModelForm):
     class Meta:
         model = Anime
         # include all fields from the Anime model
-        fields= "__all__"
+        fields= ['title', 'description', 'is_completed']

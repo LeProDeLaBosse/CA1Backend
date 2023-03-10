@@ -1,10 +1,18 @@
 {% extends '_partials/base.html' %}
 
+{% block title %}
+
+Create Anime review
+
+{% endblock %}
+
 {% load static %}
 
 {% block content %}
 
     <h3>Create anime review here</h3>
+
+    {% include '_partials/messages.html' %}
 
     <form class="ui form" method="POST" action={% url 'create-anime-review' %}>
         {% csrf_token %}

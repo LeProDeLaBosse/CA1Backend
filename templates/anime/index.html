@@ -1,5 +1,11 @@
 {% extends '_partials/base.html' %}
 
+{% block title %}
+
+Home
+
+{% endblock %}
+
 {% load static %}
 
 {% block content %}
@@ -7,6 +13,8 @@
     <!--  <image src="{% static 'img/one-piece-nawpic.png' %}" />  -->
 
     <h1 class="ui header">Anime list</h1>
+
+    {% include '_partials/messages.html' %}
 
     {% if animes %}
 

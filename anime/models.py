@@ -17,7 +17,8 @@ class Anime(models.Model):
     created_at = models.DateTimeField(default=timezone.now())
     # A timestamp indicating the date and time when the anime was last updated
     updated_at = models.DateTimeField(default=timezone.now())
-    # owner = models.ForeignKey(to=User, on_delete=models.CASCADE) # ForeignKey to User model
+
+    owner = models.ForeignKey(to=User, on_delete=models.CASCADE) # ForeignKey to User model
 
     # Define the string representation of the model
     def __str__(self):
