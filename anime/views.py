@@ -20,10 +20,13 @@ def get_showing_animes(request, animes):
     # Return all Anime objects if no 'filter' parameter is present in the request
     return animes
 
+# The login_required decorator is used to ensure that only authenticated users can access this view
 @login_required
 def index(request):
-    # Retrieve all Anime objects from the database
+    # Retrieve all Anime objects from the database that belong to the current user
     animes=Anime.objects.filter(owner=request.user)
+
+    # Count the number of completed and incompleted Anime objects
     completed_count = animes.filter(is_completed = True).count()
     incompleted_count = animes.filter(is_completed = False).count()
     all_count = animes.count()
@@ -57,6 +60,7 @@ def create_anime_review(request):
         # Save the new Anime instance to the database
         anime.save()
 
+        # Add a success message to the messages framework to be displayed on the next page
         messages.add_message(request, messages.SUCCESS, "Anime created successfully")
 
         # Redirect to the detail view for the newly created Anime instance
@@ -80,18 +84,21 @@ def anime_delete(request, id):
     context = {'anime': anime}
 
     if request.method == 'POST':
+        # Check if the logged in user is the owner of the Anime object
         if anime.owner == request.user:
 
             # If the request method is POST, delete the Anime object and redirect to the home view
             anime.delete()
 
+            # Add a success message to the messages framework to be displayed on the next page
             messages.add_message(request, messages.SUCCESS, "Anime deleted successfully")
 
             return HttpResponseRedirect(reverse('home'))
         
+        # If the user is not the owner, display the anime-delete.html template with the retrieved Anime object
         return render(request, 'anime/anime-delete.html', context)
     
-    # Render the anime-delete.html template with the retrieved Anime object
+    # If the request method is not POST, render the anime-delete.html template with the retrieved Anime object
     return render(request, 'anime/anime-delete.html', context)
 
 @login_required
