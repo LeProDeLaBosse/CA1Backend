@@ -13,4 +13,6 @@ urlpatterns = [
     path('anime-delete/<id>/', views.anime_delete, name='anime-delete'),
     # URL for editing an anime review
     path('anime-edit/<id>/', views.anime_edit, name='anime-edit'),
+    # URL 
+    path('redirect/', views.my_view, name='my-view')
 ]

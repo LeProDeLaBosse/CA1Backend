@@ -5,6 +5,45 @@ from .models import User
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from helpers.decorators import auth_user_should_not_access
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str, force_text, DjangoUnicodeDecodeError
+from .utils import generate_token
+from django.core.mail import EmailMessage
+from django.conf import settings
+import threading
+
+class EmailThread(threading.Thread):
+
+    # A thread to send emails in the background
+    def __init__(self, email):
+        self.email = email
+        threading.Thread.__init__(self)
+
+    def run(self):
+        self.email.send()
+
+
+def send_activation_email(user, request):
+    # Send email to activate user's account
+    current_site = get_current_site(request)
+    email_subject = 'Activate your account'
+    email_body = render_to_string('authentication/activate.html', {
+        'user': user,
+        'domain': current_site,
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        'token': generate_token.make_token(user)
+    })
+
+    email = EmailMessage(subject=email_subject, body=email_body,
+                         from_email=settings.EMAIL_FROM_USER,
+                         to=[user.email]
+                         )
+    
+    # Start a new thread to send the email in the background
+    if not settings.TESTING:
+        EmailThread(email).start() 
 
 # The auth_user_should_not_access decorator is used to prevent authenticated users from accessing this page
 @auth_user_should_not_access
@@ -60,8 +99,10 @@ def register(request):
         user.set_password(password)
         user.save()
 
+        send_activation_email(user, request)
+
         # Display a success message and redirect to the login page
-        messages.add_message(request, messages.SUCCESS, 'Account created successfully')
+        messages.add_message(request, messages.SUCCESS, 'We sent you an email to verify your account')
 
         return redirect('login')
 
@@ -79,9 +120,13 @@ def login_user(request):
         # Authenticate the user
         user = authenticate(request, username = username, password = password)
 
+        """if not user.is_email_verified:
+            messages.add_message(request, messages.ERROR, 'Email is not verified, please check your email inbox')
+            return render(request, 'authentication/login.html', context, status=401)"""
+
         # If authentication fails, display an error message
         if not user :
-            messages.add_message(request, messages.ERROR, 'Invalid crdentials')
+            messages.add_message(request, messages.ERROR, 'Invalid credentials')
 
             return render(request, 'authentication/login.html', context)
         
@@ -102,3 +147,23 @@ def logout_user(request):
     messages.add_message(request, messages.SUCCESS, 'Successfully logged out')
 
     return redirect(reverse('login'))
+
+def activate_user(request, uidb64, token):
+
+    # Activate the user's account based on uid and token
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+
+        user = User.objects.get(pk=uid)
+
+    except Exception as e:
+        user = None
+
+    if user and generate_token.check_token(user, token):
+        user.is_email_verified = True
+        user.save()
+
+        messages.add_message(request, messages.SUCCESS, 'Email verified, you can now login')
+        return redirect(reverse('login'))
+
+    return render(request, 'authentication/activate-failed.html', {"user": user})

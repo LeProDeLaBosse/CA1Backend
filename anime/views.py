@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import connection
 
 # Define a helper function to filter Anime objects based on the 'filter' GET parameter of the request
 def get_showing_animes(request, animes):
@@ -131,3 +132,28 @@ def anime_edit(request, id):
         return HttpResponseRedirect(reverse("anime", kwargs={'id': anime.pk}))
 
     return render(request, 'anime/anime-edit.html', context)
+
+def my_view(request):
+    # Get the user ID from the request parameters
+    user_id = request.GET.get('user_id')
+
+    # Use a parameterized query to avoid SQL injection
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM myapp_user WHERE id = %s", [user_id])
+        user = cursor.fetchone()
+
+    return render(request, 'myapp/user_detail.html', {'user': user})
+
+from django.shortcuts import redirect
+from django.http import HttpResponseRedirect
+
+def my_view(request):
+    # Get the redirect URL from the request parameters
+    redirect_url = request.GET.get('redirect_url')
+
+    # Check if the redirect URL is valid
+    if 'http' in redirect_url:
+        return HttpResponseRedirect('/invalid-redirect-url/')
+    
+    # Redirect to the internal URL
+    return redirect(redirect_url)
